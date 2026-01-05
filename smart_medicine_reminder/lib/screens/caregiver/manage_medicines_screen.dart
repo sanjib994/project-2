@@ -281,21 +281,21 @@ class _MedicineCard extends StatelessWidget {
           itemBuilder: (context) => [
             PopupMenuItem(
               onTap: onEdit,
-              child: Row(
+              child: const Row(
                 children: [
                   Icon(Icons.edit, color: Colors.blue, size: 20),
-                  const SizedBox(width: 8),
-                  const Text('Edit'),
+                  SizedBox(width: 8),
+                  Text('Edit'),
                 ],
               ),
             ),
             PopupMenuItem(
               onTap: onDelete,
-              child: Row(
+              child: const Row(
                 children: [
-                  const Icon(Icons.delete, color: Colors.red, size: 20),
-                  const SizedBox(width: 8),
-                  const Text('Delete'),
+                  Icon(Icons.delete, color: Colors.red, size: 20),
+                  SizedBox(width: 8),
+                  Text('Delete'),
                 ],
               ),
             ),
