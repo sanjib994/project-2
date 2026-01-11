@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../../models/medicine_model.dart';
 import '../../services/firestore_service.dart';
+import '../../core/theme/app_colors.dart';
+import '../../core/utils/toast_notification.dart';
 
 class AddMedicineScreen extends StatefulWidget {
   const AddMedicineScreen({super.key});
@@ -15,6 +18,7 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
   String _dosage = '';
   TimeOfDay _selectedTime = TimeOfDay.now();
   final List<String> _selectedDays = [];
+  bool _isLoading = false;
 
   final List<String> _daysOfWeek = [
     'Monday',
@@ -29,23 +33,49 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
   void _saveMedicine() async {
     if (_formKey.currentState!.validate()) {
       if (_selectedDays.isEmpty) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please select at least one day')),
+        ToastNotification.warning(
+          context,
+          'Please select at least one day',
         );
         return;
       }
+
       _formKey.currentState!.save();
+      setState(() => _isLoading = true);
 
-      final newMed = MedicineModel(
-        id: '', // Firestore generates this
-        name: _name,
-        dosage: _dosage,
-        time: _selectedTime.format(context),
-        days: _selectedDays,
-      );
+      try {
+        final newMed = MedicineModel(
+          id: '', // Firestore generates this
+          name: _name,
+          dosage: _dosage,
+          time: _selectedTime.format(context),
+          days: _selectedDays,
+        );
 
-      await FirestoreService().addMedicine(newMed);
-      if (mounted) Navigator.pop(context);
+        await FirestoreService().addMedicine(newMed);
+        HapticFeedback.heavyImpact();
+        if (mounted) {
+          ToastNotification.success(
+            context,
+            'Medicine saved successfully!',
+          );
+          Future.delayed(const Duration(milliseconds: 500), () {
+            if (mounted) Navigator.pop(context);
+          });
+        }
+      } catch (e) {
+        HapticFeedback.heavyImpact();
+        if (mounted) {
+          ToastNotification.error(
+            context,
+            'Error saving medicine: ${e.toString()}',
+          );
+        }
+      } finally {
+        if (mounted) {
+          setState(() => _isLoading = false);
+        }
+      }
     }
   }
 
@@ -58,8 +88,8 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
+        backgroundColor: AppColors.primary,
+        foregroundColor: AppColors.white,
       ),
       body: Container(
         decoration: const BoxDecoration(
@@ -199,17 +229,29 @@ class _AddMedicineScreenState extends State<AddMedicineScreen> {
                     width: double.infinity,
                     height: 60,
                     child: ElevatedButton(
-                      onPressed: _saveMedicine,
+                      onPressed: _isLoading ? null : _saveMedicine,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue,
+                        backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
                         textStyle: const TextStyle(
                             fontSize: 20, fontWeight: FontWeight.bold),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(15),
                         ),
+                        disabledBackgroundColor: AppColors.divider,
                       ),
-                      child: const Text("Save Medicine Schedule"),
+                      child: _isLoading
+                          ? const SizedBox(
+                              height: 24,
+                              width: 24,
+                              child: CircularProgressIndicator(
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  Colors.white,
+                                ),
+                                strokeWidth: 2,
+                              ),
+                            )
+                          : const Text("Save Medicine Schedule"),
                     ),
                   ),
                 ],

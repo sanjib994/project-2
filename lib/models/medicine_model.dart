@@ -5,6 +5,9 @@ class MedicineModel {
   final String time; // e.g., "08:00 AM"
   final List<String> days; // ["Monday", "Wednesday"]
   final bool isTaken;
+  final int? remainingDoses; // Optional: number of doses left
+  final DateTime? refillDate; // Optional: date for refill reminder
+  final String? notes; // Optional: additional notes
 
   MedicineModel({
     required this.id,
@@ -13,6 +16,9 @@ class MedicineModel {
     required this.time,
     required this.days,
     this.isTaken = false,
+    this.remainingDoses,
+    this.refillDate,
+    this.notes,
   });
 
   // Convert Firebase Document to Object
@@ -24,6 +30,11 @@ class MedicineModel {
       time: data['time'] ?? '',
       days: List<String>.from(data['days'] ?? []),
       isTaken: data['isTaken'] ?? false,
+      remainingDoses: data['remainingDoses'],
+      refillDate: data['refillDate'] != null
+          ? DateTime.parse(data['refillDate'])
+          : null,
+      notes: data['notes'],
     );
   }
 
@@ -35,6 +46,9 @@ class MedicineModel {
       'time': time,
       'days': days,
       'isTaken': isTaken,
+      'remainingDoses': remainingDoses,
+      'refillDate': refillDate?.toIso8601String(),
+      'notes': notes,
     };
   }
 }

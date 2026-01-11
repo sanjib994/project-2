@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_typography.dart';
+import '../../widgets/staggered_animated_card.dart';
 import '../../providers/medicine_provider.dart';
 import '../../models/medicine_model.dart';
 import '../../services/firestore_service.dart';
 import 'medicine_history_screen.dart';
-import '../caregiver/caregiver_dashboard.dart';
 import 'emergency_sos_screen.dart';
 import 'settings_screen.dart';
 
@@ -34,6 +36,17 @@ class _TodaysMedicinesScreenState extends State<TodaysMedicinesScreen> {
           width: 120,
           height: 100,
           padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(15),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                color.withOpacity(0.1),
+                color.withOpacity(0.05),
+              ],
+            ),
+          ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -41,10 +54,8 @@ class _TodaysMedicinesScreenState extends State<TodaysMedicinesScreen> {
               const SizedBox(height: 8),
               Text(
                 title,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
+                style: AppTypography.labelMedium().copyWith(
+                  color: AppColors.textPrimary,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -71,31 +82,8 @@ class _TodaysMedicinesScreenState extends State<TodaysMedicinesScreen> {
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         ),
         centerTitle: true,
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            tooltip: 'Add Medicine',
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const CaregiverDashboard()),
-              );
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.history),
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const MedicineHistoryScreen()),
-              );
-            },
-          ),
-        ],
+        backgroundColor: AppColors.primary,
+        foregroundColor: AppColors.white,
       ),
       body: Column(
         children: [
@@ -104,7 +92,8 @@ class _TodaysMedicinesScreenState extends State<TodaysMedicinesScreen> {
                 ? const Center(
                     child: Text(
                       "No medicines scheduled for today.",
-                      style: TextStyle(fontSize: 20, color: Colors.black54),
+                      style: TextStyle(
+                          fontSize: 20, color: AppColors.textSecondary),
                       textAlign: TextAlign.center,
                     ),
                   )
@@ -112,14 +101,17 @@ class _TodaysMedicinesScreenState extends State<TodaysMedicinesScreen> {
                     itemCount: todaysMedicines.length,
                     itemBuilder: (context, index) {
                       final med = todaysMedicines[index];
-                      return MedicineCardToday(medicine: med);
+                      return StaggeredAnimatedCard(
+                        delayIndex: index,
+                        child: MedicineCardToday(medicine: med),
+                      );
                     },
                   ),
           ),
-          const Divider(height: 1, color: Colors.grey),
+          const Divider(height: 1, color: AppColors.divider),
           Container(
             padding: const EdgeInsets.all(16),
-            color: Colors.grey.shade100,
+            color: AppColors.background,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -128,7 +120,7 @@ class _TodaysMedicinesScreenState extends State<TodaysMedicinesScreen> {
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black,
+                    color: AppColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -139,7 +131,7 @@ class _TodaysMedicinesScreenState extends State<TodaysMedicinesScreen> {
                       context,
                       "View History",
                       Icons.history,
-                      Colors.blue,
+                      AppColors.secondary,
                       () {
                         Navigator.push(
                           context,
@@ -153,7 +145,7 @@ class _TodaysMedicinesScreenState extends State<TodaysMedicinesScreen> {
                       context,
                       "Settings",
                       Icons.settings,
-                      Colors.orange,
+                      AppColors.statusDue,
                       () {
                         Navigator.push(
                           context,
@@ -166,7 +158,7 @@ class _TodaysMedicinesScreenState extends State<TodaysMedicinesScreen> {
                       context,
                       "Emergency",
                       Icons.warning,
-                      Colors.red,
+                      AppColors.statusMissed,
                       () {
                         Navigator.push(
                           context,

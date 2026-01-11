@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import '../../core/theme/app_colors.dart';
+import '../../core/utils/page_transitions.dart';
+import '../../widgets/mode_switcher_button.dart';
 import '../../providers/medicine_provider.dart';
 import 'reports_screen.dart';
-import 'add_medicine_screen.dart';
 import 'patient_profile_screen.dart';
 import 'manage_medicines_screen.dart';
 import 'caregiver_alerts_screen.dart';
@@ -28,7 +31,18 @@ class _CaregiverDashboardState extends State<CaregiverDashboard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("MEDIFIT")),
+      appBar: AppBar(
+        title: const Text(
+          "MEDIFIT Caregiver",
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+        ),
+        centerTitle: true,
+        backgroundColor: AppColors.primary,
+        foregroundColor: AppColors.white,
+        actions: [
+          ModeSwitcherButton(isCompact: true),
+        ],
+      ),
       body: Container(
         decoration: const BoxDecoration(
           image: DecorationImage(
@@ -41,56 +55,92 @@ class _CaregiverDashboardState extends State<CaregiverDashboard> {
           padding: const EdgeInsets.all(20),
           crossAxisCount: 2,
           children: [
-            _buildMenuCard(context, "Add Medicine", Icons.add_circle,
-                Colors.blue, const AddMedicineScreen()),
-            _buildMenuCard(context, "Manage Medicines", Icons.medication,
-                Colors.teal, const ManageMedicinesScreen()),
-            _buildMenuCard(context, "View Reports", Icons.bar_chart,
-                Colors.orange, const ReportsScreen()),
-            _buildMenuCard(context, "Alerts", Icons.notifications, Colors.red,
-                const CaregiverAlertsScreen()),
             _buildMenuCard(
-                context, "Elder Monitor", Icons.visibility, Colors.green, null),
-            _buildMenuCard(context, "Profile", Icons.person, Colors.purple,
-                const PatientProfileScreen()),
+              context,
+              "Manage Medicines",
+              Icons.medication,
+              AppColors.primary,
+              const ManageMedicinesScreen(),
+            ),
+            _buildMenuCard(
+              context,
+              "View Reports",
+              Icons.bar_chart,
+              AppColors.warning,
+              const ReportsScreen(),
+            ),
+            _buildMenuCard(
+              context,
+              "Alerts",
+              Icons.notifications,
+              AppColors.statusMissed,
+              const CaregiverAlertsScreen(),
+            ),
+            _buildMenuCard(
+              context,
+              "Profile",
+              Icons.person,
+              AppColors.secondary,
+              const PatientProfileScreen(),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildMenuCard(BuildContext context, String title, IconData icon,
-      Color color, Widget? target) {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: InkWell(
-        onTap: () {
-          if (target != null) {
-            Navigator.push(context, MaterialPageRoute(builder: (_) => target));
-          }
-        },
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(icon, size: 48, color: color),
+  Widget _buildMenuCard(
+    BuildContext context,
+    String title,
+    IconData icon,
+    Color color,
+    Widget target,
+  ) {
+    return GestureDetector(
+      onTap: () {
+        HapticFeedback.lightImpact();
+        Navigator.push(
+          context,
+          PageTransitions.slideAndFadeTransition(target),
+        );
+      },
+      child: Card(
+        elevation: 4,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+                color.withOpacity(0.1),
+                color.withOpacity(0.05),
+              ],
             ),
-            const SizedBox(height: 12),
-            Text(
-              title,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.2),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(icon, size: 48, color: color),
               ),
-              textAlign: TextAlign.center,
-            ),
-          ],
+              const SizedBox(height: 12),
+              Text(
+                title,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
         ),
       ),
     );
