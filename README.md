@@ -67,7 +67,7 @@ lib/
 https://github.com/sanjib994/Smart_medicine_reminder/main/MEDIFIT.apk
 ```
 1. Go to the Path
-2. Click on the *Download icon (Download raw file)* button at right-hand Side or click *view raw* in the center to download the application
+2. Click on the 'Download icon (Download raw file)' button at right-hand Side or click 'view raw' in the center to download the application
 3. Install and open in Android
 
 
